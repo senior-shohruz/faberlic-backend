@@ -13,7 +13,14 @@ const pickupPointRoutes = require('./routes/pickupPoints')
 const app = express()
 const PORT = 5000
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174'] }))
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://faberlic-website.vercel.app',
+    /\.vercel\.app$/,
+  ]
+}))
 app.use(express.json({ limit: '10mb' }))
 
 app.use('/api/auth', authRoutes)
