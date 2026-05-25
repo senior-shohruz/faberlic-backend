@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
-const JWT_SECRET = 'faberlic_jwt_secret_2025'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'faberlic_jwt_secret_2025'
 
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1]
@@ -7,8 +8,11 @@ function authMiddleware(req, res, next) {
   try {
     req.user = jwt.verify(token, JWT_SECRET)
     next()
-  } catch {
-    res.status(401).json({ error: "Token noto'g'ri yoki muddati tugagan" })
+  } catch (err) {
+    const msg = err.name === 'TokenExpiredError'
+      ? 'Token muddati tugagan. Qayta kiring.'
+      : "Token noto'g'ri"
+    res.status(401).json({ error: msg })
   }
 }
 
@@ -19,8 +23,11 @@ function adminMiddleware(req, res, next) {
     req.user = jwt.verify(token, JWT_SECRET)
     if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin huquqi kerak' })
     next()
-  } catch {
-    res.status(401).json({ error: "Token noto'g'ri" })
+  } catch (err) {
+    const msg = err.name === 'TokenExpiredError'
+      ? 'Token muddati tugagan. Qayta kiring.'
+      : "Token noto'g'ri"
+    res.status(401).json({ error: msg })
   }
 }
 
